@@ -60,7 +60,8 @@ function moreEffectiveGetRepeats(list){
 
 /* 3. Внесение элементов массива в объект, где ключи равны этим 
 элементам, а значения - количество повторений.
-Сложность по времени: N; сложность по памяти: N + K = N.  */
+Сложность по времени: N; 
+сложность по памяти: K (если строки приходит посимвольно).  */
 
 function getRepeats(list){
     const repeats = {};
@@ -92,3 +93,19 @@ function getRepeats(list){
 notEffectiveGetRepeats(arr);
 moreEffectiveGetRepeats(arr);
 getRepeats(arr);
+
+const sequence = [-1, 2, 4];
+
+function getMax (seq){
+    if(!seq.length) return -Infinity;
+
+    let max = seq[0];
+
+    for(let i = 1; i < seq.length; i++){
+        if(seq[i] > max)
+            max = seq[i];
+    }
+    return max
+}
+
+getMax(sequence)
