@@ -170,7 +170,7 @@ function getWater(list){
     nowMax = 0;
     console.log(ans)
     /*
-        Массив после максимума. Все аналогично
+        Массив после максимума. Все аналогично + цикл справа
     */
 
     for(let i = list.length -1; i >= maxPos; i--){
@@ -207,9 +207,7 @@ function getRLE(list){
         }
     }
 
-    let lastSym = list[0];
-    let lastPos = 0;
-    const ans = [];
+    // Возвращает символ или символ + повторения
 
     function pack(last, counter){
         if(counter > 1)
@@ -217,8 +215,19 @@ function getRLE(list){
         return `${last}`;
     }
 
+    /*
+        Считаю повторения. Иду по массиву, если следующий символ !== 
+        прошлому lastSym, тогда передаю в функцию pack прошлый lastSym
+        и сколько раз он встречался (текущая позиция i - прошлая lastPos).
+        Обновляю lastPos и lastSym на текущие.
+    */
+
+    let lastSym = list[0];
+    let lastPos = 0;
+    const ans = [];    
+
     for(let i = 0; i < list.length; i++){
-        if(list[i] !==  lastSym){
+        if(list[i] !== lastSym){
             const value = pack(lastSym, i - lastPos);
             ans.push(value);
             lastPos = i;
