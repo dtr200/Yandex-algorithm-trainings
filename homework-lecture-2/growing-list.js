@@ -2,7 +2,7 @@ function isGrows(list){
     list = list.split(' ')
                .map(num => Number(num));
 
-    if(!list.length || list.length === 1)
+    if(!list.length)
         return 'NO';
 
     let prev = list[0];
