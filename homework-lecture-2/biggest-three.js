@@ -6,129 +6,61 @@ function getBiggestThree(list){
     if(list.length === 3)
         return `${list[0]} ${list[1]} ${list[2]}`;
 
-    // Отфильтровывает минусовые и плюсовые числа
-    const getNums = (numsList, posList, sign) => {
-        for(let i = 0; i < list.length; i++){
-            if( (!sign && list[i] < 0) || 
-                (sign && list[i] >= 0) ){
-                numsList.push(list[i]);
-                posList.push(i);
-            }
-        }
-    }
+    // Сортирует первые n чисел в порядке убывания
+    const getFirst = (n) => 
+        list.slice(0, n)
+            .sort((a, b) => b - a);
 
-    // Считаю количество минусовых чисел
-    let negative = [];
-    let negativePos = [];
-    let notNegative = false;
+    let [ 
+        max1,
+        max2,
+        max3 
+    ] = getFirst(3);
 
-    getNums(negative, negativePos, false);
-
-    // Считаю количество плюсовых чисел
-    let positive = [];
-    let positivePos = [];
-    let notPositive = false;
-
-    getNums(positive, positivePos, true);
+    let [
+        min2,
+        min1
+    ] = getFirst(2);
 
     /*
-        Если минусовое только одно, тогда убираю - 
-        оно будет только уменьшать. Проверяю и отмечаю 
-        если минусовых или плюсовых вообще нет
+        Иду циклом от i = 2 для минусовых и i = 3 для плюсовых и переставляю числа если они попадают под условия
     */
-    if(negative.length === 1)
-        list.splice(negativePos[0], 1);
-    if(!negative.length)
-        notNegative = true;
-    if(!positive.length)
-        notPositive = true;
 
-    /*
-        Функция ищет самые большие плюсы, самые маленькие минусы и
-        самые большие минусы
-    */
-    let counter = 0;
-    const getBigger = (nums, sign) => {
-        const result = [];
-        while(counter <= 2 && nums[counter] !== undefined ){
-            let bigger = nums[0];
-            biggerPos = 0;
-            for(let i = 1; i < nums.length; i++){
-                const current = nums[i];    
-                if( (!sign && !notPositive && current <= bigger) ||
-                    (sign && current >= bigger) ||
-                    (!sign && notPositive && current >= bigger) ){
-                    bigger = current;
-                    biggerPos = i;
-                }        
-            }
-            nums.splice(biggerPos, 1);
-            counter++;
-            result.push(bigger);
+    for(let i = 2; i < list.length; i++){
+        if(list[i] > max1 && 
+           i > 2 &&
+           list[i] >= 0){
+            [max3, max2] = [max2, max1];
+            max1 = list[i];
         }
-        return result;
-    }
-
-    let plus;
-    let minus;
-    const result = [];
- 
-    /* 
-        Ситуация 1: есть минусы и плюсы. Беру топовые плюсы и
-        2 самых минимальных минуса (так они дадут +)
-    */
-    if(!notPositive && !notNegative){
-        plus = positive.length <= 3 ? [...positive] :
-               getBigger(positive, true);
-
-        counter = 0;
-        minus = negative.length <= 2 ? [...negative] : 
-                getBigger(negative, false)
-        minus.slice(0, 2);
-        // обьединяю плюсы и 2 минуса
-        const union = [...plus, ...minus];
-        const answer = [];
-        /* 
-            Перебираю все комбинации, каждую сохраняю в объект,
-            где mult - результат умножения, values - комбинация       
-        */
-        for(let i = 0; i < union.length; i++){
-            for(let j = i + 1; j < union.length; j++){
-                for(let k = j + 1; k < union.length; k++){
-                    const multiply = union[i] * union[j] * union[k];
-                    const res = {
-                        mult: multiply,
-                        values: [i, j, k]
-                    }
-                    answer.push(res);
-                }
-            }
+        else if(list[i] > max2 &&
+                list[i] <= max1 &&
+                i > 2 &&
+                list[i] >= 0){
+            max3 = max2;
+            max2 = list[i];
         }
-
-        /* Сортирую по результату. Первая комбинация это 
-        позиции трех самых больших чисел в объединенном массиве */
-        answer.sort((a, b) => b.mult - a.mult);
-        const [ one, two, three ] = answer[0].values;
-        result.push(union[one], union[two], union[three]);
+        else if(list[i] > max3 &&
+                list[i] <= max2 &&
+                i > 2 &&
+                list[i] >= 0){
+            max3 = list[i];
+        }
+        else if(list[i] < 0 && list[i] < min1){
+            min2 = min1;
+            min1 = list[i];
+        }
+        else if(list[i] < 0 && 
+                list[i] >= min1 && 
+                list[i] < min2){
+            min2 = list[i];
+        }
     }
-    /* 
-        Ситуация 2: есть плюсы и нет минусов. 3 топовых плюса дадут ответ
-    */
-    else if(!notPositive && notNegative){
-        result.push(...getBigger(positive, true));
-    }
-    /* 
-        Ситуация 3: есть минусы и нет плюсов. 3 последних минуса 
-        (самые большие числа) дадут ответ
-    */
-    else if(!notNegative && notPositive){
-        minus = getBigger(negative, false)
-        .slice(-3);
-        result.push(...minus);
-    }
-
-    return result.join(' ');
+    const positiveMult = max1 * max2 * max3;
+    const negativeMult = max1 * min1 * min2;
+    return positiveMult > negativeMult ? 
+        `${max1} ${max2} ${max3}` :
+        `${max1} ${min1} ${min2}`;
 }
 
-getBiggestThree('0 10 0 0 0 10');
-getBiggestThree('1 2 3');
+getBiggestThree('-5 -30000 -12 0 -20');
